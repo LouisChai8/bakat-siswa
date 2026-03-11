@@ -79,7 +79,7 @@ $posts = [
 
         <div class="relative">
             <div class="h-48 bg-blue-700 overflow-hidden">
-                <img src="/bakat-siswa/public/assets/img/nba.png" class="w-full h-full object-cover">
+                <img src="public/assets/img/nba.png" class="w-full h-full object-cover">
             </div>
 
             <div class="absolute -bottom-12 left-4 z-10">
