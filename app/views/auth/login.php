@@ -9,10 +9,10 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #949ca4; /* Warna abu-abu background luar */
+            background-color: #949ca4;
         }
         .custom-rounded {
-            border-radius: 60px; /* Corner radius ekstrem sesuai gambar */
+            border-radius: 60px;
         }
         .input-focus:focus-within {
             border-color: #000;
