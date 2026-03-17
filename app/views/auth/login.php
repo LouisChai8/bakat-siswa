@@ -72,7 +72,7 @@
             <h2 class="text-white text-3xl md:text-4xl font-bold mb-4">Hello there!</h2>
             <p class="text-gray-300 text-lg mb-12">If you dont have account</p>
             
-            <a href="signup.php" class="w-full max-w-[280px] border-2 border-white text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all text-lg">
+            <a href="/register" class="w-full max-w-[280px] border-2 border-white text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all text-lg">
                 Sign Up
             </a>
         </div>

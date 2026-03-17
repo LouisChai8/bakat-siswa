@@ -27,7 +27,7 @@
             <h2 class="text-white text-3xl md:text-4xl font-bold mb-4">Welcome back!</h2>
             <p class="text-gray-300 text-lg mb-12">If you already have an account</p>
             
-            <a href="login.php" class="w-full max-w-[280px] border-2 border-white text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all text-lg text-center">
+            <a href="/login" class="w-full max-w-[280px] border-2 border-white text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all text-lg text-center">
                 Login
             </a>
         </div>

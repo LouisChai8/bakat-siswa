@@ -4,7 +4,7 @@ namespace App\Controllers;
 class HomeController
 {
 
-    public function profile()
+    public function home()
     {
         require_once __DIR__ . '/../views/home.php';
     }

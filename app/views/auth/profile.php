@@ -69,22 +69,19 @@ $posts = [
                 </div>
 
                 <div class="absolute right-4">
-                    <div
-                        class="cursor-pointer border border-black px-3 py-1 rounded text-[10px] uppercase font-bold hover:bg-black hover:text-white transition-all">
-                        Login/Register
-                    </div>
+
                 </div>
             </div>
         </div>
 
         <div class="relative">
             <div class="h-48 bg-blue-700 overflow-hidden">
-                <img src="public/assets/img/nba.png" class="w-full h-full object-cover">
+                <img src="/assets/img/nba.png" class="w-full h-full">
             </div>
 
             <div class="absolute -bottom-12 left-4 z-10">
                 <div class="p-1 bg-white rounded-full shadow-sm">
-                    <img src="<?php echo $user['profile_pic']; ?>"
+                    <img src="/assets/img/Foto Basket Profile.png"
                         class="w-24 h-24 rounded-full border-2 border-black object-cover bg-gray-200">
                 </div>
             </div>
@@ -117,7 +114,7 @@ $posts = [
         <?php foreach ($posts as $post): ?>
             <div class="p-4 border-b border-gray hover:bg-gray-50 transition cursor-pointer">
                 <div class="flex gap-3">
-                    <img src="<?php echo $user['profile_pic']; ?>" class="w-10 h-10 rounded-full border border-gray">
+                    <img src="/assets/img/Foto Basket Profile.png" class="w-10 h-10 rounded-full border border-gray">
 
                     <div class="flex-1">
                         <div class="flex justify-between items-center">

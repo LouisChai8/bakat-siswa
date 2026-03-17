@@ -16,7 +16,7 @@ class AuthController
 
     public function registerView()
     {
-        require_once __DIR__ . '/../views/auth/signup.php';
+        require_once __DIR__ . '/../views/auth/register.php';
     }
 
 }
