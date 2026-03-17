@@ -24,12 +24,16 @@
     <div class="bg-white w-full max-w-4xl flex flex-col md:flex-row custom-rounded overflow-hidden shadow-2xl min-h-[550px]">
         
         <div class="flex-1 p-8 md:p-16 flex flex-col justify-center items-center">
-            <div class="mb-6">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C8.13 2 5 5.13 5 9C5 11.38 6.19 13.47 8 14.74V17C8 17.55 8.45 18 9 18H15C15.55 18 16 17.55 16 17V14.74C17.81 13.47 19 11.38 19 9C19 5.13 15.87 2 12 2ZM11 21C11 21.55 11.45 22 12 22C12.55 22 13 21.55 13 21H11Z" fill="black"/>
-                    <circle cx="12" cy="9" r="2" fill="white"/>
-                </svg>
-            </div>
+    
+    <div class="mb-6">
+        <div class="flex items-center gap-2 text-black">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-10 h-10">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+            </svg>
+        </div>
+    </div>
 
             <h1 class="text-3xl md:text-4xl font-extrabold text-black mb-2">Welcome Back</h1>
             <p class="text-gray-400 font-medium mb-10">Please login to your account</p>
