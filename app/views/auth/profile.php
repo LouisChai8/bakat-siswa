@@ -63,7 +63,10 @@ $posts = [
 
                 <div class="flex-1 flex justify-center text-[10px] uppercase tracking-widest font-bold">
                     <div class="flex gap-8 items-center">
-                        <div class="cursor-pointer hover:text-blue-600 transition">Home</div>
+                        
+                        <a href="/home" class="flex-1 flex items-center justify-center font-bold text-[11px] uppercase tracking-wider border-r border-gray text-gray-400 hover:text-black transition cursor-pointer">
+                    Home
+                </a>
                         <div class="cursor-pointer border-b-2 border-black pb-1">Postingan saya</div>
                     </div>
                 </div>
