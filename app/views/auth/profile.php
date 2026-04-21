@@ -130,7 +130,7 @@ $posts = [
                         </div>
 
                         <p class="mt-1 text-sm"><?php echo $post['content']; ?></p>
-
+                    
                         <div
                             class="mt-3 aspect-video bg-gray-100 border border-gray rounded-2xl overflow-hidden flex items-center justify-center">
                             <span class="text-gray-300 text-xs italic">Post image placeholder</span>
