@@ -3,7 +3,6 @@ namespace App\Controllers;
 
 class AuthController
 {
-
     public function profile()
     {
         require_once __DIR__ . '/../views/auth/profile.php';
@@ -19,4 +18,8 @@ class AuthController
         require_once __DIR__ . '/../views/auth/register.php';
     }
 
+    public function editProfile()
+    {
+        require_once __DIR__ . '/../views/editprofile.php';
+    }
 }

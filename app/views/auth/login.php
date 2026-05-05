@@ -21,7 +21,7 @@
 </head>
 <body class="h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white w-full max-w-4xl flex flex-col md:flex-row custom-rounded overflow-hidden shadow-2xl min-h-[550px]">
+    <div class="bg-white w-full max-w-4xl flex flex-col md:flex-row custom-rounded overflow-hidden shadow-2xl">
         
         <div class="flex-1 p-8 md:p-16 flex flex-col justify-center items-center">
     
@@ -72,7 +72,7 @@
             <h2 class="text-white text-3xl md:text-4xl font-bold mb-4">Hello there!</h2>
             <p class="text-gray-300 text-lg mb-12">If you dont have account</p>
             
-            <a href="/register" class="w-full max-w-[280px] border-2 border-white text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all text-lg">
+            <a href="/register" class="w-full border-2 border-white text-white font-bold py-4 rounded-2xl hover:bg-white hover:text-black transition-all text-lg">
                 Sign Up
             </a>
         </div>
