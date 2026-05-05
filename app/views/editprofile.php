@@ -196,7 +196,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             pointer-events: none;
             padding-top: 10px;
         }
-        .username-input { padding-left: 28px !important; }
+        .username-input { padding-left: 13px !important; }
 
         /* Fade in animation */
         @keyframes fadeUp {

@@ -9,6 +9,6 @@ $router->add('GET', '/profile', 'AuthController', 'profile');
 $router->add('GET', '/login', 'AuthController', 'LoginView');
 $router->add('GET', '/register', 'AuthController', 'registerView');
 $router->add('GET', '/home', 'HomeController', 'home');
-$router->add('GET', '/editprofile', 'AuthController', 'editProfile');
+$router->add('GET', '/profile/edit', 'AuthController', 'editProfile');
 
 $router->run();

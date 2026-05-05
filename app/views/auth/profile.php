@@ -1,7 +1,7 @@
 <?php
 $user = [
     "name" => "Achai Ganteng",
-    "username" => "@laragooners",
+    "username" =>"laragooners",
     "bio" => "Orang paling ganteng",
     "following" => 4,
     "followers" => 4,
@@ -55,7 +55,31 @@ $posts = [
         }
 
         .anim-navbar  { animation: fadeDown 0.4s ease both; }
+        .anim-nav     { animation: fadeDown 0.4s ease both; }
         .anim-header  { animation: scaleIn 0.5s ease both 0.05s; }
+
+        /* ── Nav link underline slide ── */
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #000;
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
+        }
+        .nav-link.active::after {
+            transform: scaleX(1);
+        }
+        .nav-link:not(.active):hover::after {
+            transform: scaleX(1);
+            opacity: 0.3;
+        }
         .anim-avatar  { animation: scaleIn 0.45s cubic-bezier(.34,1.56,.64,1) both 0.2s; }
         .anim-editbtn { animation: fadeUp 0.4s ease both 0.25s; }
         .anim-info    { animation: fadeUp 0.4s ease both 0.3s; }
@@ -199,6 +223,175 @@ $posts = [
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* ── Comment modal (bottom sheet) ── */
+        #commentModal {
+            position: fixed;
+            inset: 0;
+            z-index: 998;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: rgba(0,0,0,0);
+            pointer-events: none;
+            transition: background 0.28s ease;
+        }
+        #commentModal.show {
+            background: rgba(0,0,0,0.45);
+            pointer-events: all;
+        }
+        #commentModal .comment-sheet {
+            background: #fff;
+            width: 100%;
+            max-width: 672px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+            transform: translateY(100%);
+            transition: transform 0.32s cubic-bezier(.32,.72,0,1);
+            box-shadow: 0 -4px 32px rgba(0,0,0,0.12);
+            overflow: hidden;
+        }
+        #commentModal.show .comment-sheet {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 36px;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            margin: 12px auto 8px;
+            flex-shrink: 0;
+        }
+        .sheet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px 12px;
+            border-bottom: 1px solid #efefef;
+            flex-shrink: 0;
+        }
+        .sheet-header h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .sheet-close-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+            color: #374151;
+        }
+        .sheet-close-btn:hover { background: #e5e7eb; }
+        .comment-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .comment-list::-webkit-scrollbar { width: 4px; }
+        .comment-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
+        .comment-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 16px;
+            transition: background 0.12s;
+        }
+        .comment-row:hover { background: #f9fafb; }
+        .comment-row img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #efefef;
+        }
+        .comment-meta { flex: 1; min-width: 0; }
+        .comment-meta .cm-name { font-size: 13px; font-weight: 700; color: #111; }
+        .comment-meta .cm-handle { font-size: 12px; color: #9ca3af; margin-left: 4px; }
+        .comment-meta .cm-text { font-size: 14px; color: #1f2937; margin-top: 2px; line-height: 1.4; word-break: break-word; }
+        .comment-like {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        .comment-like button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #d1d5db;
+            transition: color 0.15s, transform 0.12s;
+            display: flex;
+        }
+        .comment-like button:active { transform: scale(0.85); }
+        .comment-like button.liked { color: #ef4444; }
+        .comment-like button.liked svg { fill: #ef4444; stroke: #ef4444; }
+        .comment-like .like-count { font-size: 11px; color: #9ca3af; }
+        .comment-composer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-top: 1px solid #efefef;
+            flex-shrink: 0;
+            background: #fff;
+        }
+        .comment-composer img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #efefef;
+            flex-shrink: 0;
+        }
+        .comment-input-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #f3f4f6;
+            border-radius: 99px;
+            padding: 0 12px;
+            height: 38px;
+        }
+        .comment-input-wrap input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #111;
+            font-family: inherit;
+        }
+        .comment-input-wrap input::placeholder { color: #9ca3af; }
+        .btn-send {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: #d1d5db;
+            padding: 0;
+            transition: color 0.15s, transform 0.12s;
+        }
+        .btn-send:hover { color: #111; }
+        .btn-send:active { transform: scale(0.88); }
+        .btn-send.has-text { color: #111; }
+        @keyframes commentSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .comment-row.new-comment { animation: commentSlideIn 0.22s ease; }
     </style>
 </head>
 
@@ -216,27 +409,62 @@ $posts = [
     </div>
 </div>
 
+<!-- Comment modal (bottom sheet) -->
+<div id="commentModal">
+    <div class="comment-sheet">
+        <div class="sheet-handle"></div>
+        <div class="sheet-header">
+            <h4>Comments</h4>
+            <button class="sheet-close-btn" onclick="closeCommentModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <div class="comment-list" id="commentList"></div>
+        <div class="comment-composer">
+            <img src="/assets/img/Foto Basket Profile.png" alt="me">
+            <div class="comment-input-wrap">
+                <input type="text" id="commentInput" placeholder="Add your comment..." maxlength="280"
+                       oninput="onCommentInput(this)" onkeydown="onCommentKey(event)">
+                <button class="btn-send" id="sendBtn" onclick="submitComment()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="max-w-xl mx-auto border-x border-gray min-h-screen relative">
 
     <!-- Navbar -->
-    <div class="anim-navbar sticky top-0 z-50 bg-white/80 backdrop-blur-md text-black h-14 w-full border-b border-gray">
-        <div class="relative max-w-xl mx-auto flex items-center h-full px-4">
-            <div class="absolute left-4">
-                <div class="flex items-center gap-2 cursor-pointer hover:text-blue-600 transition-all text-black">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
-                    </svg>
-                </div>
-            </div>
-            <div class="flex-1 flex justify-center text-[10px] uppercase tracking-widest font-bold">
-                <div class="flex gap-8 items-center">
-                    <a href="/home" class="flex-1 flex items-center justify-center font-bold text-[11px] uppercase tracking-wider border-r border-gray text-gray-400 hover:text-black transition cursor-pointer">Home</a>
-                    <div class="cursor-pointer border-b-2 border-black pb-1">My Post</div>
-                </div>
-            </div>
-            <div class="absolute right-4"></div>
+    <nav class="anim-nav sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray h-16 flex items-center px-4 relative">
+        <div class="absolute left-4 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18" />
+            </svg>
         </div>
-    </div>
+
+        <div class="mx-auto flex h-full items-center gap-8">
+            <a href="/home"
+                class="nav-link font-extrabold text-[11px] uppercase tracking-wider text-gray-400 hover:text-black transition h-full flex items-center">Home</a>
+            <a href="/profile"
+                class="nav-link active font-extrabold text-[11px] uppercase tracking-wider h-full flex items-center">My Post</a>
+        </div>
+
+        <div class="absolute right-4">
+            <a href="/login"
+                class="bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-wider hover:bg-gray-800 transition shadow-sm">
+                Login/Register
+            </a>
+        </div>
+    </nav>
 
     <!-- Header image -->
     <div class="anim-header relative">
@@ -254,7 +482,7 @@ $posts = [
 
         <!-- Edit button -->
         <div class="anim-editbtn flex justify-end p-4">
-            <a href="/editprofile"
+            <a href="/profile/edit"
                 class="btn-edit border border-black px-4 py-1.5 rounded-full font-bold text-xs inline-block">
                 Edit Profile
             </a>
@@ -295,7 +523,7 @@ $posts = [
                 <p class="mt-1 text-sm"><?php echo $post['content']; ?></p>
 
                 <div class="mt-3 aspect-video bg-gray-100 border border-gray rounded-2xl overflow-hidden flex items-center justify-center">
-                    <span class="text-gray-300 text-xs italic">Post image placeholder</span>
+                    <span class="text-gray-300 text-xs italic"></span>
                 </div>
 
                 <!-- Action buttons -->
@@ -303,7 +531,7 @@ $posts = [
 
                     <!-- Reply -->
                     <button class="action-btn reply"
-                        onclick="toggleAction(this, 'reply', <?php echo $post['id']; ?>)"
+                        onclick="openCommentModal(<?php echo $post['id']; ?>)"
                         data-count="<?php echo $post['replies']; ?>"
                         data-active="false">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
@@ -350,121 +578,7 @@ $posts = [
 
 </div>
 
-<script>
-// ── Toggle action (reply / repost / like) ──
-function toggleAction(btn, type, postId) {
-    const isActive = btn.dataset.active === 'true';
-    const countEl  = btn.querySelector('.count-label');
-    let count      = parseInt(btn.dataset.count);
-
-    if (isActive) {
-        // Cancel → -1
-        count--;
-        btn.dataset.active = 'false';
-        btn.classList.remove('active');
-        // Unfill heart
-        if (type === 'like') {
-            const path = btn.querySelector('path');
-            btn.querySelector('svg').setAttribute('fill', 'none');
-        }
-    } else {
-        // Activate → +1
-        count++;
-        btn.dataset.active = 'true';
-        btn.classList.add('active');
-        // Fill heart
-        if (type === 'like') {
-            btn.querySelector('svg').setAttribute('fill', '#ef4444');
-            btn.querySelector('svg').setAttribute('stroke', '#ef4444');
-            const heartIcon = btn.querySelector('.heart-icon');
-            heartIcon.classList.remove('heart-burst');
-            void heartIcon.offsetWidth; // reflow
-            heartIcon.classList.add('heart-burst');
-        }
-    }
-
-    btn.dataset.count = count;
-    countEl.textContent = formatCount(count);
-
-    // Number pop animation
-    countEl.classList.remove('num-pop');
-    void countEl.offsetWidth;
-    countEl.classList.add('num-pop');
-}
-
-// ── Delete modal ──
-let pendingDeleteBtn = null;
-let pendingDeleteId  = null;
-
-function askDelete(btn, postId) {
-    pendingDeleteBtn = btn;
-    pendingDeleteId  = postId;
-    document.getElementById('deleteModal').classList.add('show');
-}
-
-function cancelDelete() {
-    document.getElementById('deleteModal').classList.remove('show');
-    pendingDeleteBtn = null;
-    pendingDeleteId  = null;
-}
-
-function confirmDelete() {
-    document.getElementById('deleteModal').classList.remove('show');
-    if (!pendingDeleteBtn) return;
-
-    // Animate post out
-    const postCard = pendingDeleteBtn.closest('.post-card');
-    postCard.style.transition = 'opacity 0.3s ease, transform 0.3s ease, max-height 0.4s ease 0.2s, padding 0.4s ease 0.2s, margin 0.4s ease 0.2s';
-    postCard.style.opacity = '0';
-    postCard.style.transform = 'translateX(30px)';
-    setTimeout(() => {
-        postCard.style.maxHeight = postCard.offsetHeight + 'px';
-        requestAnimationFrame(() => {
-            postCard.style.maxHeight = '0';
-            postCard.style.padding = '0';
-            postCard.style.margin = '0';
-            postCard.style.overflow = 'hidden';
-            postCard.style.borderWidth = '0';
-        });
-        setTimeout(() => postCard.remove(), 500);
-    }, 280);
-
-    pendingDeleteBtn = null;
-    pendingDeleteId  = null;
-}
-
-// Close modal on backdrop click
-document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) cancelDelete();
-});
-
-// ── Format count (e.g. 1200 → 1.2K) ──
-function formatCount(n) {
-    if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-    if (n >= 1000)    return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-    return n;
-}
-
-// ── Scroll reveal ──
-const reveals = document.querySelectorAll('.reveal');
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-        if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            observer.unobserve(e.target);
-        }
-    });
-}, { threshold: 0.1 });
-reveals.forEach(el => observer.observe(el));
-
-// ── Remove animation class after heart burst ──
-document.querySelectorAll('.heart-icon').forEach(el => {
-    el.addEventListener('animationend', () => el.classList.remove('heart-burst'));
-});
-document.querySelectorAll('.count-label').forEach(el => {
-    el.addEventListener('animationend', () => el.classList.remove('num-pop'));
-});
-</script>
+<script src="/js/profile.js"></script>
 
 </body>
 </html>

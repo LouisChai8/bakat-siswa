@@ -348,6 +348,175 @@
             transform: scaleX(1);
             opacity: 0.3;
         }
+
+        /* ── Comment modal (bottom sheet) ── */
+        #commentModal {
+            position: fixed;
+            inset: 0;
+            z-index: 998;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            background: rgba(0,0,0,0);
+            pointer-events: none;
+            transition: background 0.28s ease;
+        }
+        #commentModal.show {
+            background: rgba(0,0,0,0.45);
+            pointer-events: all;
+        }
+        #commentModal .comment-sheet {
+            background: #fff;
+            width: 100%;
+            max-width: 672px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            flex-direction: column;
+            max-height: 80vh;
+            transform: translateY(100%);
+            transition: transform 0.32s cubic-bezier(.32,.72,0,1);
+            box-shadow: 0 -4px 32px rgba(0,0,0,0.12);
+            overflow: hidden;
+        }
+        #commentModal.show .comment-sheet {
+            transform: translateY(0);
+        }
+        .sheet-handle {
+            width: 36px;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 99px;
+            margin: 12px auto 8px;
+            flex-shrink: 0;
+        }
+        .sheet-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px 12px;
+            border-bottom: 1px solid #efefef;
+            flex-shrink: 0;
+        }
+        .sheet-header h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 0;
+        }
+        .sheet-close-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.15s;
+            color: #374151;
+        }
+        .sheet-close-btn:hover { background: #e5e7eb; }
+        .comment-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+        .comment-list::-webkit-scrollbar { width: 4px; }
+        .comment-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
+        .comment-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 16px;
+            transition: background 0.12s;
+        }
+        .comment-row:hover { background: #f9fafb; }
+        .comment-row img {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #efefef;
+        }
+        .comment-meta { flex: 1; min-width: 0; }
+        .comment-meta .cm-name { font-size: 13px; font-weight: 700; color: #111; }
+        .comment-meta .cm-handle { font-size: 12px; color: #9ca3af; margin-left: 4px; }
+        .comment-meta .cm-text { font-size: 14px; color: #1f2937; margin-top: 2px; line-height: 1.4; word-break: break-word; }
+        .comment-like {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+        .comment-like button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: #d1d5db;
+            transition: color 0.15s, transform 0.12s;
+            display: flex;
+        }
+        .comment-like button:active { transform: scale(0.85); }
+        .comment-like button.liked { color: #ef4444; }
+        .comment-like button.liked svg { fill: #ef4444; stroke: #ef4444; }
+        .comment-like .like-count { font-size: 11px; color: #9ca3af; }
+        .comment-composer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-top: 1px solid #efefef;
+            flex-shrink: 0;
+            background: #fff;
+        }
+        .comment-composer img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #efefef;
+            flex-shrink: 0;
+        }
+        .comment-input-wrap {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: #f3f4f6;
+            border-radius: 99px;
+            padding: 0 12px;
+            height: 38px;
+        }
+        .comment-input-wrap input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            font-size: 14px;
+            color: #111;
+            font-family: 'Inter', sans-serif;
+        }
+        .comment-input-wrap input::placeholder { color: #9ca3af; }
+        .btn-send {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: #d1d5db;
+            padding: 0;
+            transition: color 0.15s, transform 0.12s;
+        }
+        .btn-send:hover { color: #111; }
+        .btn-send:active { transform: scale(0.88); }
+        .btn-send.has-text { color: #111; }
+        @keyframes commentSlideIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .comment-row.new-comment { animation: commentSlideIn 0.22s ease; }
     </style>
 </head>
 
@@ -364,6 +533,36 @@
                     class="flex-1 border border-gray-200 rounded-full py-2 text-[13px] font-semibold hover:bg-gray-50 transition">Batal</button>
                 <button onclick="confirmDelete()"
                     class="flex-1 bg-red-500 text-white rounded-full py-2 text-[13px] font-bold hover:bg-red-600 transition">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comment modal (bottom sheet) -->
+    <div id="commentModal">
+        <div class="comment-sheet">
+            <div class="sheet-handle"></div>
+            <div class="sheet-header">
+                <h4>Comments</h4>
+                <button class="sheet-close-btn" onclick="closeCommentModal()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="comment-list" id="commentList"></div>
+            <div class="comment-composer">
+                <img src="/assets/img/Foto Basket Profile.png" alt="me">
+                <div class="comment-input-wrap">
+                    <input type="text" id="commentInput" placeholder="Add your comment..." maxlength="280"
+                           oninput="onCommentInput(this)" onkeydown="onCommentKey(event)">
+                    <button class="btn-send" id="sendBtn" onclick="submitComment()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+                             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -460,7 +659,7 @@
                                 <div class="flex justify-between mt-2 max-w-sm">
 
                                     <!-- Reply -->
-                                    <button class="action-btn reply" onclick="toggleAction(this,'reply')"
+                                    <button class="action-btn reply" onclick="openCommentModal(<?php echo $post['id']; ?>)"
                                         data-count="<?php echo $post['replies']; ?>" data-active="false">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                             stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
@@ -612,6 +811,143 @@
             if (e.target.classList.contains('heart-wrap')) e.target.classList.remove('heart-burst');
             if (e.target.classList.contains('count-label')) e.target.classList.remove('num-pop');
         }, true);
+
+        // ── Comment modal ──
+        const commentData = {
+            1: [
+                { name: 'Abun',     handle: '@laragooners', text: 'Gila bagus banget idenya sangat briliant.', likes: 64 },
+                { name: 'Dello',    handle: '@laragooners', text: 'Gila, ini aesthetic banget.',               likes: 43 },
+                { name: 'Achai',    handle: '@laragooners', text: 'Ajari aku suhu',                            likes: 26 },
+                { name: 'Ryo',      handle: '@laragooners', text: 'Lokasi dimana ini? Keren banget.',          likes: 114 },
+                { name: 'Natanael', handle: '@laragooners', text: 'Next main bareng gak',                      likes: 78 },
+            ],
+            2: [
+                { name: 'Rico',     handle: '@laragooners', text: 'Gak Ngajak',  likes: 29 },
+                { name: 'Abun',     handle: '@laragooners', text: 'Jago Banget',  likes: 74 },
+            ],
+            3: [
+                { name: 'Abun',     handle: '@laragooners', text: 'Pakai camera apa ni', likes: 62 },
+                { name: 'Dello',    handle: '@laragooners', text: 'Enak kayaknya!',       likes: 55 },
+            ],
+        };
+
+        let activePostId = null;
+
+        function openCommentModal(postId) {
+            activePostId = postId;
+            const list = document.getElementById('commentList');
+            const comments = commentData[postId] || [];
+            list.innerHTML = comments.length === 0
+                ? '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:32px 0;">No comments yet. Be the first!</p>'
+                : comments.map((c, i) => buildCommentRow(c, i)).join('');
+            document.getElementById('commentModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+            setTimeout(() => document.getElementById('commentInput').focus(), 350);
+        }
+
+        function closeCommentModal() {
+            document.getElementById('commentModal').classList.remove('show');
+            document.body.style.overflow = '';
+            document.getElementById('commentInput').value = '';
+            document.getElementById('sendBtn').classList.remove('has-text');
+        }
+
+        function buildCommentRow(c, i) {
+            return `<div class="comment-row">
+                <img src="/assets/img/Foto Basket Profile.png" alt="${c.name}">
+                <div class="comment-meta">
+                    <span class="cm-name">${c.name}</span>
+                    <span class="cm-handle">${c.handle}</span>
+                    <p class="cm-text">${c.text}</p>
+                </div>
+                <div class="comment-like">
+                    <button onclick="toggleCommentLike(this, ${i})" data-active="false">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                             stroke-width="1.8" stroke="currentColor" width="16" height="16">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                        </svg>
+                    </button>
+                    <span class="like-count">${c.likes}</span>
+                </div>
+            </div>`;
+        }
+
+        function toggleCommentLike(btn, index) {
+            const isActive = btn.dataset.active === 'true';
+            const countEl  = btn.closest('.comment-like').querySelector('.like-count');
+            let count = parseInt(countEl.textContent);
+            if (isActive) {
+                count--;
+                btn.dataset.active = 'false';
+                btn.classList.remove('liked');
+                btn.querySelector('svg').setAttribute('fill', 'none');
+                btn.querySelector('svg').setAttribute('stroke', 'currentColor');
+            } else {
+                count++;
+                btn.dataset.active = 'true';
+                btn.classList.add('liked');
+                btn.querySelector('svg').setAttribute('fill', '#ef4444');
+                btn.querySelector('svg').setAttribute('stroke', '#ef4444');
+            }
+            countEl.textContent = count;
+            if (activePostId && commentData[activePostId] && commentData[activePostId][index]) {
+                commentData[activePostId][index].likes = count;
+            }
+        }
+
+        function onCommentInput(input) {
+            document.getElementById('sendBtn').classList.toggle('has-text', input.value.trim().length > 0);
+        }
+
+        function onCommentKey(e) {
+            if (e.key === 'Enter') submitComment();
+        }
+
+        function submitComment() {
+            const input = document.getElementById('commentInput');
+            const text  = input.value.trim();
+            if (!text || !activePostId) return;
+
+            const newComment = { name: 'Achai', handle: '@laragooners', text, likes: 0 };
+            if (!commentData[activePostId]) commentData[activePostId] = [];
+            commentData[activePostId].push(newComment);
+
+            const list  = document.getElementById('commentList');
+            const index = commentData[activePostId].length - 1;
+            const div   = document.createElement('div');
+            div.innerHTML = buildCommentRow(newComment, index);
+            const row = div.firstElementChild;
+            row.classList.add('new-comment');
+            list.appendChild(row);
+            list.scrollTop = list.scrollHeight;
+
+            input.value = '';
+            document.getElementById('sendBtn').classList.remove('has-text');
+
+            // update reply counter on the post card
+            const postCard = document.querySelector(`[data-post-id="${activePostId}"]`);
+            if (postCard) {
+                const replyBtn = postCard.querySelector('.action-btn.reply');
+                if (replyBtn) {
+                    const countEl = replyBtn.querySelector('.count-label');
+                    const c = parseInt(replyBtn.dataset.count || 0) + 1;
+                    replyBtn.dataset.count = c;
+                    countEl.textContent = formatCount(c);
+                    countEl.classList.remove('num-pop');
+                    void countEl.offsetWidth;
+                    countEl.classList.add('num-pop');
+                }
+            }
+        }
+
+        document.getElementById('commentModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCommentModal();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeCommentModal();
+        });
     </script>
 
 </body>
