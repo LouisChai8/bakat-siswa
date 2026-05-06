@@ -10,8 +10,8 @@ $user = [
 ];
 
 $posts = [
-    ["id" => 1, "content" => "Orang paling ganteng", "time" => "5h", "replies" => 65, "reposts" => 111, "likes" => 708],
-    ["id" => 2, "content" => "Orang paling ganteng", "time" => "5h", "replies" => 65, "reposts" => 111, "likes" => 708],
+    ["id" => 1, "content" => "My Lovely Family❤️", "time" => "5h", "replies" => 65, "reposts" => 111, "likes" => 708],
+    ["id" => 2, "content" => "Orang paling ganteng😎🤣", "time" => "5h", "replies" => 65, "reposts" => 111, "likes" => 708],
 ];
 ?>
 
@@ -125,7 +125,6 @@ $posts = [
         }
         .stat-item:hover strong { color: #1d9bf0; }
 
-        /* ── Action buttons ── */
         .action-btn {
             display: flex;
             align-items: center;
@@ -139,27 +138,22 @@ $posts = [
         }
         .action-btn:active { transform: scale(0.9); }
 
-        /* Reply */
         .action-btn.reply { color: #6b7280; }
         .action-btn.reply:hover { background: rgba(29,155,240,0.1); color: #1d9bf0; }
         .action-btn.reply.active { color: #1d9bf0; }
 
-        /* Repost */
         .action-btn.repost { color: #6b7280; }
         .action-btn.repost:hover { background: rgba(34,197,94,0.1); color: #16a34a; }
         .action-btn.repost.active { color: #16a34a; background: rgba(34,197,94,0.1); }
 
-        /* Like */
         .action-btn.like { color: #6b7280; }
         .action-btn.like:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
         .action-btn.like.active { color: #ef4444; background: rgba(239,68,68,0.1); }
 
-        /* Delete */
         .action-btn.delete { color: #6b7280; }
         .action-btn.delete:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
         .action-btn.delete.active { color: #ef4444; }
 
-        /* Number pop animation */
         @keyframes numPop {
             0%   { transform: translateY(0) scale(1); }
             40%  { transform: translateY(-4px) scale(1.15); }
@@ -167,7 +161,6 @@ $posts = [
         }
         .num-pop { animation: numPop 0.25s ease; }
 
-        /* Heart burst animation */
         @keyframes heartBurst {
             0%   { transform: scale(1); }
             30%  { transform: scale(1.5); }
@@ -176,7 +169,6 @@ $posts = [
         }
         .heart-burst { animation: heartBurst 0.35s ease; }
 
-        /* ── Delete confirm modal ── */
         #deleteModal {
             position: fixed;
             inset: 0;
@@ -207,13 +199,11 @@ $posts = [
             transform: scale(1) translateY(0);
         }
 
-        /* ── Post card hover ── */
         .post-card {
             transition: background 0.15s;
         }
         .post-card:hover { background: #f9fafb; }
 
-        /* ── Scroll reveal ── */
         .reveal {
             opacity: 0;
             transform: translateY(18px);
@@ -224,7 +214,6 @@ $posts = [
             transform: translateY(0);
         }
 
-        /* ── Comment modal (bottom sheet) ── */
         #commentModal {
             position: fixed;
             inset: 0;
@@ -397,7 +386,6 @@ $posts = [
 
 <body class="font-sans">
 
-<!-- Delete confirmation modal -->
 <div id="deleteModal">
     <div class="modal-box">
         <h3 class="text-[16px] font-bold mb-1">Delete This Post?</h3>
@@ -409,7 +397,6 @@ $posts = [
     </div>
 </div>
 
-<!-- Comment modal (bottom sheet) -->
 <div id="commentModal">
     <div class="comment-sheet">
         <div class="sheet-handle"></div>
