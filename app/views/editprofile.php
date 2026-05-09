@@ -17,9 +17,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user['username'] = htmlspecialchars($_POST['username'] ?? $user['username']);
     $user['bio'] = htmlspecialchars($_POST['bio'] ?? $user['bio']);
 
-    // Handle file uploads (profile pic & header)
-    // ... your upload logic here
-
     // Redirect back to profile after save
     header("Location: /profile");
     exit;
@@ -238,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 
 <!-- Toast -->
-<div id="toast">✓ Perubahan disimpan</div>
+<div id="toast">✓ Changes are saved</div>
 
 <div class="max-w-xl mx-auto border-x border-gray-200 min-h-screen bg-white">
 

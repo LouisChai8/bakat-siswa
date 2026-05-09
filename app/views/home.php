@@ -423,26 +423,49 @@
         }
         .comment-list::-webkit-scrollbar { width: 4px; }
         .comment-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
-        .comment-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 16px;
-            transition: background 0.12s;
-        }
+        .comment-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; transition: background 0.12s; position: relative; }
         .comment-row:hover { background: #f9fafb; }
-        .comment-row img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            border: 1px solid #efefef;
-        }
+        .comment-row img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid #efefef; }
         .comment-meta { flex: 1; min-width: 0; }
         .comment-meta .cm-name { font-size: 13px; font-weight: 700; color: #111; }
         .comment-meta .cm-handle { font-size: 12px; color: #9ca3af; margin-left: 4px; }
         .comment-meta .cm-text { font-size: 14px; color: #1f2937; margin-top: 2px; line-height: 1.4; word-break: break-word; }
+
+        /* ── Delete button (shows on hover) ── */
+        .cm-delete-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #fee2e2;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, background 0.15s ease, transform 0.12s ease;
+        }
+        .comment-row:hover .cm-delete-btn {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .cm-delete-btn:hover { background: #fca5a5; transform: translateY(-50%) scale(1.1); }
+        .cm-delete-btn:active { transform: translateY(-50%) scale(0.92); }
+
+        @keyframes commentFadeOut {
+            from { opacity: 1; transform: translateX(0); max-height: 80px; }
+            to   { opacity: 0; transform: translateX(20px); max-height: 0; padding: 0; }
+        }
+        .comment-row.removing {
+            animation: commentFadeOut 0.25s ease forwards;
+            overflow: hidden;
+        }
         .comment-like {
             display: flex;
             flex-direction: column;
@@ -587,7 +610,7 @@
             </div>
 
             <div class="absolute right-4">
-                <a href="/login.php"
+                <a href="/login"
                     class="bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-wider hover:bg-gray-800 transition shadow-sm">
                     Login/Register
                 </a>
@@ -614,7 +637,7 @@
                 class="composer-avatar w-10 h-10 rounded-full border border-gray object-cover shadow-sm">
             <div class="flex-1 bg-[#f3f3f3] rounded-full px-4 py-2 flex items-center justify-between">
                 <span class="text-sm font-bold text-black">What's Happening?</span>
-                <button onclick="window.location.href='/post/add';"
+                <button onclick="window.location.href='/addpost'"
                     class="btn-addpost bg-white border border-gray rounded-full px-4 py-1 text-[11px] font-bold flex items-center gap-1 shadow-sm">
                     Add Post <span class="text-lg leading-none">+</span>
                 </button>
@@ -624,11 +647,19 @@
         <!-- Posts -->
         <div class="divide-y divide-gray" id="postFeed">
             <?php
-            $posts = [
-                ['id' => 1, 'img' => 'dunk.jpg',  'content' => 'First Time Dunk',              'replies' => 65, 'reposts' => 111, 'likes' => 708],
-                ['id' => 2, 'img' => 'anak.jpg',  'content' => 'Main Sama Anak',               'replies' => 65, 'reposts' => 111, 'likes' => 708],
-                ['id' => 3, 'img' => 'Makan.png', 'content' => 'Makan Bareng Teman Teman SMA', 'replies' => 65, 'reposts' => 111, 'likes' => 708],
-            ];
+            require_once __DIR__ . '/../../app/core/Database.php';
+            $db   = \App\Core\Database::connect();
+            $stmt = $db->query('
+                SELECT p.id, p.content, p.image AS img,
+                       COUNT(c.id) AS replies,
+                       0            AS reposts,
+                       0            AS likes
+                FROM   posts p
+                LEFT JOIN comments c ON c.post_id = p.id
+                GROUP  BY p.id
+                ORDER  BY p.created_at DESC
+            ');
+            $posts = $stmt->fetchAll();
             foreach ($posts as $i => $post):
             ?>
                 <div class="post-card reveal p-4 cursor-pointer" data-post-id="<?php echo $post['id']; ?>">

@@ -8,21 +8,17 @@ function toggleAction(btn, type) {
         count--;
         btn.dataset.active = 'false';
         btn.classList.remove('active');
-
         if (type === 'like') {
             btn.querySelector('svg').setAttribute('fill', 'none');
             btn.querySelector('svg').setAttribute('stroke', 'currentColor');
         }
-
     } else {
         count++;
         btn.dataset.active = 'true';
         btn.classList.add('active');
-
         if (type === 'like') {
             btn.querySelector('svg').setAttribute('fill', '#ef4444');
             btn.querySelector('svg').setAttribute('stroke', '#ef4444');
-
             const heart = btn.querySelector('.heart-icon');
             heart.classList.remove('heart-burst');
             void heart.offsetWidth;
@@ -32,29 +28,25 @@ function toggleAction(btn, type) {
 
     btn.dataset.count = count;
     countEl.textContent = formatCount(count);
-
     countEl.classList.remove('num-pop');
     void countEl.offsetWidth;
     countEl.classList.add('num-pop');
 }
 
-// ── Delete ──
+// ── Delete post ──
 let pendingDeleteBtn = null;
 
 function askDelete(btn) {
     pendingDeleteBtn = btn;
     document.getElementById('deleteModal').classList.add('show');
 }
-
 function cancelDelete() {
     document.getElementById('deleteModal').classList.remove('show');
     pendingDeleteBtn = null;
 }
-
 function confirmDelete() {
     document.getElementById('deleteModal').classList.remove('show');
     if (!pendingDeleteBtn) return;
-
     const card = pendingDeleteBtn.closest('.post-card');
     card.style.transition = 'opacity 0.28s ease, transform 0.28s ease, max-height 0.38s ease 0.22s, padding 0.38s ease 0.22s';
     card.style.opacity = '0';
@@ -70,11 +62,8 @@ function confirmDelete() {
         });
         setTimeout(() => card.remove(), 420);
     }, 260);
-
     pendingDeleteBtn = null;
 }
-
-// backdrop click
 document.getElementById('deleteModal').addEventListener('click', e => {
     if (e.target === document.getElementById('deleteModal')) cancelDelete();
 });
@@ -87,61 +76,54 @@ function formatCount(n) {
 }
 
 // ── Scroll reveal ──
-const reveals = document.querySelectorAll('.reveal');
 const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
-        if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            observer.unobserve(e.target);
-        }
+        if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); }
     });
 }, { threshold: 0.08 });
-reveals.forEach(el => observer.observe(el));
-
-// ── Staggered post entry on load ──
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 document.querySelectorAll('.post-card').forEach((el, i) => {
     el.style.animationDelay = (0.18 + i * 0.1) + 's';
 });
-
-// ── Clean up animation classes ──
 document.addEventListener('animationend', e => {
-    if (e.target.classList.contains('heart-wrap')) e.target.classList.remove('heart-burst');
+    if (e.target.classList.contains('heart-icon'))  e.target.classList.remove('heart-burst');
     if (e.target.classList.contains('count-label')) e.target.classList.remove('num-pop');
 }, true);
 
-// ── Comment modal ──
-const commentData = {
-    1: [
-        { name: 'Abun',     handle: '@laragooners', text: 'Gila bagus banget idenya sangat briliant.', likes: 64 },
-        { name: 'Dello',    handle: '@laragooners', text: 'Gila, ini aesthetic banget.',               likes: 43 },
-        { name: 'Achai',    handle: '@laragooners', text: 'Ajari aku suhu',                            likes: 26 },
-        { name: 'Ryo',      handle: '@laragooners', text: 'Lokasi dimana ini? Keren banget.',          likes: 114 },
-        { name: 'Natanael', handle: '@laragooners', text: 'Next main bareng gak',                      likes: 78 },
-    ],
-    2: [
-        { name: 'Rico',     handle: '@laragooners', text: 'Gak Ngajak',  likes: 29 },
-        { name: 'Abun',     handle: '@laragooners', text: 'Jago Banget',  likes: 74 },
-    ],
-    3: [
-        { name: 'Abun',     handle: '@laragooners', text: 'Pakai camera apa ni', likes: 62 },
-        { name: 'Dello',    handle: '@laragooners', text: 'Enak kayaknya!',       likes: 55 },
-    ],
-};
+// ═══════════════════════════════════════════════════
+//  COMMENT MODAL — reads & writes to the database
+// ═══════════════════════════════════════════════════
+
+const CURRENT_USER_ID = 1; // TODO: swap with session user_id once auth is ready
 
 let activePostId = null;
 
-function openCommentModal(postId) {
+// ── Open modal: fetch ALL comments for this post from DB ──
+async function openCommentModal(postId) {
     activePostId = postId;
-    const list = document.getElementById('commentList');
-    const comments = commentData[postId] || [];
-    list.innerHTML = comments.length === 0
-        ? '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:32px 0;">No comments yet. Be the first!</p>'
-        : comments.map((c, i) => buildCommentRow(c, i)).join('');
     document.getElementById('commentModal').classList.add('show');
     document.body.style.overflow = 'hidden';
-    setTimeout(() => document.getElementById('commentInput').focus(), 350);
+
+    const list = document.getElementById('commentList');
+    list.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:32px 0;">Loading...</p>';
+
+    try {
+        const res      = await fetch(`/comments?post_id=${postId}`);
+        const json     = await res.json();
+        const comments = json.data || [];
+
+        renderComments(comments);
+
+        // Sync the reply button count with the real DB total
+        setReplyCount(postId, comments.length);
+    } catch {
+        list.innerHTML = '<p style="text-align:center;color:#ef4444;font-size:13px;padding:32px 0;">Failed to load. Try again.</p>';
+    }
+
+    setTimeout(() => document.getElementById('commentInput').focus(), 300);
 }
 
+// ── Close modal ──
 function closeCommentModal() {
     document.getElementById('commentModal').classList.remove('show');
     document.body.style.overflow = '';
@@ -149,99 +131,163 @@ function closeCommentModal() {
     document.getElementById('sendBtn').classList.remove('has-text');
 }
 
-function buildCommentRow(c, i) {
-    return `<div class="comment-row">
-        <img src="/assets/img/Foto Basket Profile.png" alt="${c.name}">
+// ── Render all comment rows ──
+function renderComments(comments) {
+    const list = document.getElementById('commentList');
+    list.innerHTML = comments.length
+        ? comments.map(c => buildCommentRow(c)).join('')
+        : '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:32px 0;">No comments yet. Be the first!</p>';
+}
+
+// ── Build one comment row HTML ──
+function buildCommentRow(c) {
+    const avatar = c.profile_pic
+        ? `<img src="${c.profile_pic}" alt="${c.name}">`
+        : `<img src="/assets/img/Foto Basket Profile.png" alt="${c.name}">`;
+
+    return `<div class="comment-row" data-id="${c.id}">
+        ${avatar}
         <div class="comment-meta">
             <span class="cm-name">${c.name}</span>
-            <span class="cm-handle">${c.handle}</span>
-            <p class="cm-text">${c.text}</p>
+            <span class="cm-handle">@${c.username}</span>
+            <p class="cm-text">${c.content}</p>
         </div>
-        <div class="comment-like">
-            <button onclick="toggleCommentLike(this, ${i})" data-active="false">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                     stroke-width="1.8" stroke="currentColor" width="16" height="16">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                </svg>
-            </button>
-            <span class="like-count">${c.likes}</span>
-        </div>
+        <button class="cm-delete-btn" onclick="deleteComment(${c.id}, this)" title="Delete comment">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                 stroke-width="2" stroke="currentColor" width="14" height="14">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+            </svg>
+        </button>
     </div>`;
 }
 
-function toggleCommentLike(btn, index) {
-    const isActive = btn.dataset.active === 'true';
-    const countEl  = btn.closest('.comment-like').querySelector('.like-count');
-    let count = parseInt(countEl.textContent);
-    if (isActive) {
-        count--;
-        btn.dataset.active = 'false';
-        btn.classList.remove('liked');
-        btn.querySelector('svg').setAttribute('fill', 'none');
-        btn.querySelector('svg').setAttribute('stroke', 'currentColor');
-    } else {
-        count++;
-        btn.dataset.active = 'true';
-        btn.classList.add('liked');
-        btn.querySelector('svg').setAttribute('fill', '#ef4444');
-        btn.querySelector('svg').setAttribute('stroke', '#ef4444');
-    }
-    countEl.textContent = count;
-    if (activePostId && commentData[activePostId] && commentData[activePostId][index]) {
-        commentData[activePostId][index].likes = count;
+// ── Delete a comment → DELETE /comments/{id} → removed from DB ──
+async function deleteComment(commentId, btn) {
+    const row = btn.closest('.comment-row');
+
+    // Animate out first, then call API
+    row.classList.add('removing');
+
+    setTimeout(async () => {
+        try {
+            const res  = await fetch(`/comments/${commentId}`, {
+                method:  'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ user_id: CURRENT_USER_ID })
+            });
+            const json = await res.json();
+
+            if (json.success) {
+                row.remove();
+                bumpReplyCount(activePostId, -1);
+
+                // Show empty state if no comments left
+                const list = document.getElementById('commentList');
+                if (!list.querySelector('.comment-row')) {
+                    list.innerHTML = '<p style="text-align:center;color:#9ca3af;font-size:13px;padding:32px 0;">No comments yet. Be the first!</p>';
+                }
+            } else {
+                // Restore row if API failed
+                row.classList.remove('removing');
+            }
+        } catch {
+            row.classList.remove('removing');
+        }
+    }, 220);
+}
+
+// ── Submit new comment → POST /comments → saved to DB ──
+async function submitComment() {
+    const input   = document.getElementById('commentInput');
+    const content = input.value.trim();
+    if (!content || !activePostId) return;
+
+    const sendBtn = document.getElementById('sendBtn');
+    sendBtn.style.opacity       = '0.4';
+    sendBtn.style.pointerEvents = 'none';
+
+    try {
+        const res  = await fetch('/comments', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({
+                post_id: activePostId,
+                user_id: CURRENT_USER_ID,
+                content
+            })
+        });
+        const json = await res.json();
+
+        if (json.success) {
+            const list = document.getElementById('commentList');
+
+            // Remove "no comments" placeholder if present
+            const placeholder = list.querySelector('p');
+            if (placeholder) placeholder.remove();
+
+            // Append the new comment with animation
+            const div = document.createElement('div');
+            div.innerHTML = buildCommentRow(json.data);
+            const row = div.firstElementChild;
+            row.classList.add('new-comment');
+            list.appendChild(row);
+            list.scrollTop = list.scrollHeight;
+
+            // Clear input
+            input.value = '';
+            sendBtn.classList.remove('has-text');
+
+            // ✅ +1 on the reply/comment button of this post card
+            bumpReplyCount(activePostId, +1);
+        } else {
+            alert('Could not post comment. Please try again.');
+        }
+    } catch {
+        alert('Network error. Please try again.');
+    } finally {
+        sendBtn.style.opacity       = '1';
+        sendBtn.style.pointerEvents = '';
     }
 }
 
+// ── Set reply count to exact number (syncs with DB total on open) ──
+function setReplyCount(postId, total) {
+    const card = document.querySelector(`[data-post-id="${postId}"]`);
+    if (!card) return;
+    const replyBtn = card.querySelector('.action-btn.reply');
+    if (!replyBtn) return;
+    replyBtn.dataset.count = total;
+    replyBtn.querySelector('.count-label').textContent = formatCount(total);
+}
+
+// ── Bump reply count +1 or -1 with pop animation ──
+function bumpReplyCount(postId, delta) {
+    const card = document.querySelector(`[data-post-id="${postId}"]`);
+    if (!card) return;
+    const replyBtn = card.querySelector('.action-btn.reply');
+    if (!replyBtn) return;
+    const countEl  = replyBtn.querySelector('.count-label');
+    const newCount = Math.max(0, parseInt(replyBtn.dataset.count || 0) + delta);
+    replyBtn.dataset.count   = newCount;
+    countEl.textContent      = formatCount(newCount);
+    countEl.classList.remove('num-pop');
+    void countEl.offsetWidth;
+    countEl.classList.add('num-pop');
+}
+
+// ── Input handlers ──
 function onCommentInput(input) {
     document.getElementById('sendBtn').classList.toggle('has-text', input.value.trim().length > 0);
 }
-
 function onCommentKey(e) {
     if (e.key === 'Enter') submitComment();
 }
 
-function submitComment() {
-    const input = document.getElementById('commentInput');
-    const text  = input.value.trim();
-    if (!text || !activePostId) return;
-
-    const newComment = { name: 'Achai', handle: '@laragooners', text, likes: 0 };
-    if (!commentData[activePostId]) commentData[activePostId] = [];
-    commentData[activePostId].push(newComment);
-
-    const list  = document.getElementById('commentList');
-    const index = commentData[activePostId].length - 1;
-    const div   = document.createElement('div');
-    div.innerHTML = buildCommentRow(newComment, index);
-    const row = div.firstElementChild;
-    row.classList.add('new-comment');
-    list.appendChild(row);
-    list.scrollTop = list.scrollHeight;
-
-    input.value = '';
-    document.getElementById('sendBtn').classList.remove('has-text');
-
-    // update reply counter on the post card
-    const postCard = document.querySelector(`[data-post-id="${activePostId}"]`);
-    if (postCard) {
-        const replyBtn = postCard.querySelector('.action-btn.reply');
-        if (replyBtn) {
-            const countEl = replyBtn.querySelector('.count-label');
-            const c = parseInt(replyBtn.dataset.count || 0) + 1;
-            replyBtn.dataset.count = c;
-            countEl.textContent = formatCount(c);
-            countEl.classList.remove('num-pop');
-            void countEl.offsetWidth;
-            countEl.classList.add('num-pop');
-        }
-    }
-}
-
+// ── Backdrop / Escape close ──
 document.getElementById('commentModal').addEventListener('click', function(e) {
     if (e.target === this) closeCommentModal();
 });
-
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') closeCommentModal();
 });

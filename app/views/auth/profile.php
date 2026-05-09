@@ -1,7 +1,7 @@
 <?php
 $user = [
     "name" => "Achai Ganteng",
-    "username" =>"laragooners",
+    "username" => "@laragooners",
     "bio" => "Orang paling ganteng",
     "following" => 4,
     "followers" => 4,
@@ -9,10 +9,20 @@ $user = [
     "header_img" => "",
 ];
 
-$posts = [
-    ["id" => 1, "content" => "My Lovely Family❤️", "time" => "5h", "replies" => 65, "reposts" => 111, "likes" => 708],
-    ["id" => 2, "content" => "Orang paling ganteng😎🤣", "time" => "5h", "replies" => 65, "reposts" => 111, "likes" => 708],
-];
+require_once __DIR__ . '/../../core/Database.php';
+$db   = \App\Core\Database::connect();
+$stmt = $db->query('
+    SELECT p.id, p.content, p.image,
+           COUNT(c.id) AS replies,
+           0            AS reposts,
+           0            AS likes,
+           p.created_at AS time
+    FROM   posts p
+    LEFT JOIN comments c ON c.post_id = p.id
+    GROUP  BY p.id
+    ORDER  BY p.created_at DESC
+');
+$posts = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -125,6 +135,7 @@ $posts = [
         }
         .stat-item:hover strong { color: #1d9bf0; }
 
+        /* ── Action buttons ── */
         .action-btn {
             display: flex;
             align-items: center;
@@ -138,22 +149,27 @@ $posts = [
         }
         .action-btn:active { transform: scale(0.9); }
 
+        /* Reply */
         .action-btn.reply { color: #6b7280; }
         .action-btn.reply:hover { background: rgba(29,155,240,0.1); color: #1d9bf0; }
         .action-btn.reply.active { color: #1d9bf0; }
 
+        /* Repost */
         .action-btn.repost { color: #6b7280; }
         .action-btn.repost:hover { background: rgba(34,197,94,0.1); color: #16a34a; }
         .action-btn.repost.active { color: #16a34a; background: rgba(34,197,94,0.1); }
 
+        /* Like */
         .action-btn.like { color: #6b7280; }
         .action-btn.like:hover { background: rgba(239,68,68,0.1); color: #ef4444; }
         .action-btn.like.active { color: #ef4444; background: rgba(239,68,68,0.1); }
 
+        /* Delete */
         .action-btn.delete { color: #6b7280; }
         .action-btn.delete:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
         .action-btn.delete.active { color: #ef4444; }
 
+        /* Number pop animation */
         @keyframes numPop {
             0%   { transform: translateY(0) scale(1); }
             40%  { transform: translateY(-4px) scale(1.15); }
@@ -161,6 +177,7 @@ $posts = [
         }
         .num-pop { animation: numPop 0.25s ease; }
 
+        /* Heart burst animation */
         @keyframes heartBurst {
             0%   { transform: scale(1); }
             30%  { transform: scale(1.5); }
@@ -169,6 +186,7 @@ $posts = [
         }
         .heart-burst { animation: heartBurst 0.35s ease; }
 
+        /* ── Delete confirm modal ── */
         #deleteModal {
             position: fixed;
             inset: 0;
@@ -199,11 +217,13 @@ $posts = [
             transform: scale(1) translateY(0);
         }
 
+        /* ── Post card hover ── */
         .post-card {
             transition: background 0.15s;
         }
         .post-card:hover { background: #f9fafb; }
 
+        /* ── Scroll reveal ── */
         .reveal {
             opacity: 0;
             transform: translateY(18px);
@@ -214,6 +234,7 @@ $posts = [
             transform: translateY(0);
         }
 
+        /* ── Comment modal (bottom sheet) ── */
         #commentModal {
             position: fixed;
             inset: 0;
@@ -287,26 +308,49 @@ $posts = [
         }
         .comment-list::-webkit-scrollbar { width: 4px; }
         .comment-list::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }
-        .comment-row {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 10px 16px;
-            transition: background 0.12s;
-        }
+        .comment-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 16px; transition: background 0.12s; position: relative; }
         .comment-row:hover { background: #f9fafb; }
-        .comment-row img {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            object-fit: cover;
-            flex-shrink: 0;
-            border: 1px solid #efefef;
-        }
+        .comment-row img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid #efefef; }
         .comment-meta { flex: 1; min-width: 0; }
         .comment-meta .cm-name { font-size: 13px; font-weight: 700; color: #111; }
         .comment-meta .cm-handle { font-size: 12px; color: #9ca3af; margin-left: 4px; }
         .comment-meta .cm-text { font-size: 14px; color: #1f2937; margin-top: 2px; line-height: 1.4; word-break: break-word; }
+
+        /* ── Delete button (shows on hover) ── */
+        .cm-delete-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: #fee2e2;
+            color: #ef4444;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.15s ease, background 0.15s ease, transform 0.12s ease;
+        }
+        .comment-row:hover .cm-delete-btn {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .cm-delete-btn:hover { background: #fca5a5; transform: translateY(-50%) scale(1.1); }
+        .cm-delete-btn:active { transform: translateY(-50%) scale(0.92); }
+
+        @keyframes commentFadeOut {
+            from { opacity: 1; transform: translateX(0); max-height: 80px; }
+            to   { opacity: 0; transform: translateX(20px); max-height: 0; padding: 0; }
+        }
+        .comment-row.removing {
+            animation: commentFadeOut 0.25s ease forwards;
+            overflow: hidden;
+        }
         .comment-like {
             display: flex;
             flex-direction: column;
@@ -386,6 +430,7 @@ $posts = [
 
 <body class="font-sans">
 
+<!-- Delete confirmation modal -->
 <div id="deleteModal">
     <div class="modal-box">
         <h3 class="text-[16px] font-bold mb-1">Delete This Post?</h3>
@@ -397,6 +442,7 @@ $posts = [
     </div>
 </div>
 
+<!-- Comment modal (bottom sheet) -->
 <div id="commentModal">
     <div class="comment-sheet">
         <div class="sheet-handle"></div>
@@ -469,7 +515,7 @@ $posts = [
 
         <!-- Edit button -->
         <div class="anim-editbtn flex justify-end p-4">
-            <a href="/profile/edit"
+            <a href="/editprofile"
                 class="btn-edit border border-black px-4 py-1.5 rounded-full font-bold text-xs inline-block">
                 Edit Profile
             </a>
@@ -502,7 +548,14 @@ $posts = [
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-1">
                         <span class="font-bold text-sm"><?php echo $user['name']; ?></span>
-                        <span class="text-gray-500 text-xs"><?php echo $user['username']; ?> · <?php echo $post['time']; ?></span>
+                        <span class="text-gray-500 text-xs"><?php echo $user['username']; ?> · <?php
+                            $ts   = strtotime($post['time']);
+                            $diff = time() - $ts;
+                            if ($diff < 60)          echo $diff . 's';
+                            elseif ($diff < 3600)    echo floor($diff/60) . 'm';
+                            elseif ($diff < 86400)   echo floor($diff/3600) . 'h';
+                            else                     echo floor($diff/86400) . 'd';
+                        ?></span>
                     </div>
                     <span class="text-gray-400 text-xs select-none">•••</span>
                 </div>
