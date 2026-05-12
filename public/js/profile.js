@@ -301,7 +301,7 @@ async function submitComment() {
         if (json.success) {
             const list = document.getElementById('commentList');
 
-            // Remove "no comments" placeholder if present
+            // Menghapus placeholder "No comments" jika ini adalah komentar pertama
             const placeholder = list.querySelector('p');
             if (placeholder) placeholder.remove();
 
@@ -317,7 +317,7 @@ async function submitComment() {
             input.value = '';
             sendBtn.classList.remove('has-text');
 
-            // ✅ +1 on the reply/comment button of this post card
+            // +1 untuk count di tombol reply pada card post
             bumpReplyCount(activePostId, +1);
         } else {
             alert('Could not post comment. Please try again.');
@@ -330,7 +330,7 @@ async function submitComment() {
     }
 }
 
-// ── Set reply count to exact number (syncs with DB total on open) ──
+// ── Mengatur angka agar sesuai dengan total di DatBase ──
 function setReplyCount(postId, total) {
     const card = document.querySelector(`[data-post-id="${postId}"]`);
     if (!card) return;
@@ -340,7 +340,7 @@ function setReplyCount(postId, total) {
     replyBtn.querySelector('.count-label').textContent = formatCount(total);
 }
 
-// ── Bump reply count +1 or -1 with pop animation ──
+// ── Bump efek saat +1 dan -1 ──
 function bumpReplyCount(postId, delta) {
     const card = document.querySelector(`[data-post-id="${postId}"]`);
     if (!card) return;

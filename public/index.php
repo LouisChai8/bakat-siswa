@@ -19,6 +19,7 @@ $router->add('POST',   '/comments',       'CommentController', 'store');
 $router->add('DELETE', '/comments/{id}',  'CommentController', 'destroy');
 
 // ── Post API routes ──
-$router->add('PUT', '/posts/{id}', 'PostController', 'update');
+$router->add('POST', '/posts',      'PostController', 'store');   // create new post
+$router->add('PUT',  '/posts/{id}', 'PostController', 'update');  // edit post
 
 $router->run();

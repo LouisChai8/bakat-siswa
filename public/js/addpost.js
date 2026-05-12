@@ -1,6 +1,6 @@
 // ── Character counter ──
 function onContentInput(textarea) {
-    const len = textarea.value.length;
+    const len     = textarea.value.length;
     const counter = document.getElementById('charCount');
     counter.textContent = `${len} / 280`;
     counter.classList.remove('warn', 'limit');
@@ -9,7 +9,7 @@ function onContentInput(textarea) {
     validateForm();
 }
 
-// ── Validate: enable submit only when content is not empty ──
+// ── Enable Post button only when content is filled ──
 function validateForm() {
     const content = document.getElementById('postContent').value.trim();
     document.getElementById('submitBtn').disabled = content.length === 0;
@@ -36,7 +36,7 @@ function onDrop(event) {
     if (file && file.type.startsWith('image/')) loadImageFile(file);
 }
 
-// ── Load image into preview ──
+// ── Show image preview ──
 function loadImageFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -47,7 +47,7 @@ function loadImageFile(file) {
     reader.readAsDataURL(file);
 }
 
-// ── Remove image ──
+// ── Remove chosen image ──
 function removeImage() {
     document.getElementById('previewImg').src = '';
     document.getElementById('previewWrap').classList.add('hidden');
@@ -59,12 +59,8 @@ function removeImage() {
 const tags = [];
 
 function onTagKey(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        addTag();
-    }
+    if (event.key === 'Enter') { event.preventDefault(); addTag(); }
 }
-
 function addTag() {
     const input = document.getElementById('tagInput');
     const raw   = input.value.trim().replace(/\s+/g, '').toLowerCase();
@@ -73,13 +69,11 @@ function addTag() {
     renderTags();
     input.value = '';
 }
-
 function removeTag(tag) {
     const idx = tags.indexOf(tag);
     if (idx > -1) tags.splice(idx, 1);
     renderTags();
 }
-
 function renderTags() {
     const list = document.getElementById('tagList');
     list.innerHTML = tags.map(t => `
@@ -90,7 +84,7 @@ function renderTags() {
     `).join('');
 }
 
-// ── Text formatting (insert around selection) ──
+// ── Text formatting ──
 function insertFormat(before, after) {
     const ta    = document.getElementById('postContent');
     const start = ta.selectionStart;
@@ -105,10 +99,8 @@ function insertFormat(before, after) {
 
 // ── Emoji picker ──
 function toggleEmojiPicker() {
-    const picker = document.getElementById('emojiPicker');
-    picker.classList.toggle('hidden');
+    document.getElementById('emojiPicker').classList.toggle('hidden');
 }
-
 function insertEmoji(emoji) {
     const ta  = document.getElementById('postContent');
     const pos = ta.selectionStart;
@@ -118,43 +110,57 @@ function insertEmoji(emoji) {
     document.getElementById('emojiPicker').classList.add('hidden');
     onContentInput(ta);
 }
-
-// close emoji picker on outside click
 document.addEventListener('click', (e) => {
-    const picker  = document.getElementById('emojiPicker');
+    const picker   = document.getElementById('emojiPicker');
     const emojiBtn = document.querySelector('[title="Emoji"]');
     if (!picker.contains(e.target) && e.target !== emojiBtn) {
         picker.classList.add('hidden');
     }
 });
 
-// ── Submit post ──
-function submitPost() {
+// ── Submit post → POST /posts → saves to DB + uploads image ──
+async function submitPost() {
     const content = document.getElementById('postContent').value.trim();
     if (!content) return;
 
-    // Disable button & show loading state
     const btn = document.getElementById('submitBtn');
     btn.disabled    = true;
     btn.textContent = 'Posting...';
 
-    // Simulate async submit (replace with real fetch/form submit)
-    setTimeout(() => {
-        showToast('✓ Post berhasil dibuat!');
-        // Reset form
-        document.getElementById('postContent').value = '';
-        document.getElementById('charCount').textContent = '0 / 280';
-        document.getElementById('charCount').classList.remove('warn', 'limit');
-        removeImage();
-        tags.length = 0;
-        renderTags();
+    // Build FormData so the image file is included
+    const formData = new FormData();
+    formData.append('user_id', 1); // TODO: replace with real session user_id
+    formData.append('content', content);
+
+    const fileInput = document.getElementById('fileInput');
+    if (fileInput.files[0]) {
+        formData.append('image', fileInput.files[0]);
+    }
+
+    try {
+        const res  = await fetch('/posts', {
+            method: 'POST',
+            body:   formData   // Do NOT set Content-Type header — browser sets it with boundary
+        });
+        const json = await res.json();
+
+        if (json.success) {
+            showToast('✓ Post berhasil dibuat!');
+            // Redirect to profile after short delay
+            setTimeout(() => { window.location.href = '/profile'; }, 1000);
+        } else {
+            alert(json.error || 'Failed to post. Please try again.');
+            btn.disabled    = false;
+            btn.textContent = 'Post';
+        }
+    } catch {
+        alert('Network error. Please try again.');
+        btn.disabled    = false;
         btn.textContent = 'Post';
-        // Redirect to home after short delay
-        setTimeout(() => { window.location.href = '/home'; }, 1200);
-    }, 800);
+    }
 }
 
-// ── Toast notification ──
+// ── Toast ──
 function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
@@ -169,9 +175,3 @@ function goBack() {
     }
     window.history.back();
 }
-
-// ── Wire up home page "Add Post" button ──
-// If this script is also included in home.php, uncomment below:
-// document.querySelx`ector('.btn-addpost')?.addEventListener('click', () => {
-//     window.location.href = '/addpost';
-// });

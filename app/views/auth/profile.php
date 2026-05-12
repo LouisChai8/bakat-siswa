@@ -552,13 +552,6 @@ $posts = $stmt->fetchAll();
             <a href="/profile"
                 class="nav-link active font-extrabold text-[11px] uppercase tracking-wider h-full flex items-center">My Post</a>
         </div>
-
-        <div class="absolute right-4">
-            <a href="/login.php"
-                class="bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-wider hover:bg-gray-800 transition shadow-sm">
-                Login/Register
-            </a>
-        </div>
     </nav>
 
     <!-- Header image -->
@@ -612,7 +605,7 @@ $posts = $stmt->fetchAll();
                         <span class="font-bold text-sm"><?php echo $user['name']; ?></span>
                         <span class="text-gray-500 text-xs"><?php echo $user['username']; ?> · <?php
                             $ts   = strtotime($post['time']);
-                            $diff = time() - $ts;
+                            $diff = abs(time() - $ts);
                             if ($diff < 60)          echo $diff . 's';
                             elseif ($diff < 3600)    echo floor($diff/60) . 'm';
                             elseif ($diff < 86400)   echo floor($diff/3600) . 'h';
