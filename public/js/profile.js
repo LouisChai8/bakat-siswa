@@ -71,6 +71,83 @@ document.getElementById('deleteModal').addEventListener('click', function(e) {
     if (e.target === this) cancelDelete();
 });
 
+// ── Edit post modal ──
+let pendingEditBtn  = null;
+let pendingEditId   = null;
+
+function askEdit(btn, postId, currentContent) {
+    pendingEditBtn = btn;
+    pendingEditId  = postId;
+
+    const input = document.getElementById('editContentInput');
+    input.value = currentContent;
+    onEditInput(input);
+
+    document.getElementById('editModal').classList.add('show');
+    setTimeout(() => input.focus(), 200);
+}
+
+function cancelEdit() {
+    document.getElementById('editModal').classList.remove('show');
+    pendingEditBtn = null;
+    pendingEditId  = null;
+}
+
+function onEditInput(textarea) {
+    const len     = textarea.value.length;
+    const counter = document.getElementById('editCharCount');
+    counter.textContent = `${len} / 280`;
+    counter.classList.remove('warn', 'limit');
+    if (len >= 280)      counter.classList.add('limit');
+    else if (len >= 220) counter.classList.add('warn');
+}
+
+async function confirmEdit() {
+    const content = document.getElementById('editContentInput').value.trim();
+    if (!content || !pendingEditId) return;
+
+    const saveBtn = document.querySelector('#editModal button:last-child');
+    saveBtn.textContent  = 'Saving...';
+    saveBtn.disabled     = true;
+
+    try {
+        const res  = await fetch(`/posts/${pendingEditId}`, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ content })
+        });
+        const json = await res.json();
+
+        if (json.success) {
+            // Update the post text in the card immediately — no reload needed
+            const card    = document.querySelector(`[data-post-id="${pendingEditId}"]`);
+            const textEl  = card?.querySelector('.post-content-text');
+            if (textEl) textEl.textContent = content;
+
+            // Update the onclick attribute so next edit opens with new content
+            if (pendingEditBtn) {
+                pendingEditBtn.setAttribute(
+                    'onclick',
+                    `askEdit(this, ${pendingEditId}, '${content.replace(/'/g, "\\'")}')`
+                );
+            }
+
+            cancelEdit();
+        } else {
+            alert('Failed to save. Please try again.');
+        }
+    } catch {
+        alert('Network error. Please try again.');
+    } finally {
+        saveBtn.textContent = 'Save';
+        saveBtn.disabled    = false;
+    }
+}
+
+document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) cancelEdit();
+});
+
 // ── Format count ──
 function formatCount(n) {
     if (n >= 1000000) return (n / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';

@@ -9,7 +9,7 @@ $user = [
     "header_img" => "",
 ];
 
-require_once __DIR__ . '/../../core/Database.php';
+require_once __DIR__ . '/../../../app/core/Database.php';
 $db   = \App\Core\Database::connect();
 $stmt = $db->query('
     SELECT p.id, p.content, p.image,
@@ -168,6 +168,53 @@ $posts = $stmt->fetchAll();
         .action-btn.delete { color: #6b7280; }
         .action-btn.delete:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
         .action-btn.delete.active { color: #ef4444; }
+
+        /* ── Edit button ── */
+        .action-btn.edit { color: #6b7280; }
+        .action-btn.edit:hover { background: rgba(59,130,246,0.08); color: #3b82f6; }
+
+        /* ── Edit post modal ── */
+        #editModal {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.45);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.22s ease;
+        }
+        #editModal.show { opacity: 1; pointer-events: all; }
+        #editModal .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 480px;
+            transform: scale(0.88) translateY(16px);
+            transition: transform 0.25s cubic-bezier(.34,1.56,.64,1);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+        }
+        #editModal.show .modal-box { transform: scale(1) translateY(0); }
+        #editModal h3 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
+        #editContentInput {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 12px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: none;
+            outline: none;
+            transition: border-color 0.2s;
+            line-height: 1.5;
+        }
+        #editContentInput:focus { border-color: #000; }
+        .edit-char-count { text-align: right; font-size: 11px; color: #9ca3af; margin-top: 4px; }
+        .edit-char-count.warn  { color: #f59e0b; }
+        .edit-char-count.limit { color: #ef4444; }
 
         /* Number pop animation */
         @keyframes numPop {
@@ -442,6 +489,21 @@ $posts = $stmt->fetchAll();
     </div>
 </div>
 
+<!-- Edit post modal -->
+<div id="editModal">
+    <div class="modal-box">
+        <h3>Edit Post</h3>
+        <textarea id="editContentInput" rows="4" maxlength="280" oninput="onEditInput(this)"></textarea>
+        <p class="edit-char-count" id="editCharCount">0 / 280</p>
+        <div class="flex gap-3 mt-4">
+            <button onclick="cancelEdit()"
+                class="flex-1 border border-gray-200 rounded-full py-2 text-sm font-semibold hover:bg-gray-50 transition">Cancel</button>
+            <button onclick="confirmEdit()"
+                class="flex-1 bg-black text-white rounded-full py-2 text-sm font-bold hover:bg-gray-800 transition">Save</button>
+        </div>
+    </div>
+</div>
+
 <!-- Comment modal (bottom sheet) -->
 <div id="commentModal">
     <div class="comment-sheet">
@@ -492,7 +554,7 @@ $posts = $stmt->fetchAll();
         </div>
 
         <div class="absolute right-4">
-            <a href="/login"
+            <a href="/login.php"
                 class="bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-wider hover:bg-gray-800 transition shadow-sm">
                 Login/Register
             </a>
@@ -560,14 +622,17 @@ $posts = $stmt->fetchAll();
                     <span class="text-gray-400 text-xs select-none">•••</span>
                 </div>
 
-                <p class="mt-1 text-sm"><?php echo $post['content']; ?></p>
+                <p class="mt-1 text-sm post-content-text"><?php echo $post['content']; ?></p>
 
-                <div class="mt-3 aspect-video bg-gray-100 border border-gray rounded-2xl overflow-hidden flex items-center justify-center">
-                    <span class="text-gray-300 text-xs italic"></span>
+                <?php if (!empty($post['image'])): ?>
+                <div class="mt-3 rounded-2xl overflow-hidden border border-gray bg-gray-100">
+                    <img src="/assets/img/<?php echo htmlspecialchars($post['image']); ?>"
+                         class="w-full object-cover" style="max-height:320px;">
                 </div>
+                <?php endif; ?>
 
                 <!-- Action buttons -->
-                <div class="flex justify-between mt-4 max-w-sm">
+                <div class="flex justify-between mt-4 w-full">
 
                     <!-- Reply -->
                     <button class="action-btn reply"
@@ -607,6 +672,14 @@ $posts = $stmt->fetchAll();
                         onclick="askDelete(this, <?php echo $post['id']; ?>)">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                        </svg>
+                    </button>
+
+                    <!-- Edit -->
+                    <button class="action-btn edit"
+                        onclick="askEdit(this, <?php echo $post['id']; ?>, '<?php echo addslashes($post['content']); ?>')">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/>
                         </svg>
                     </button>
 
