@@ -212,6 +212,9 @@
   .absolute {
     position: absolute;
   }
+  .fixed {
+    position: fixed;
+  }
   .relative {
     position: relative;
   }
@@ -236,8 +239,14 @@
   .right-4 {
     right: calc(var(--spacing) * 4);
   }
+  .right-6 {
+    right: calc(var(--spacing) * 6);
+  }
   .-bottom-12 {
     bottom: calc(var(--spacing) * -12);
+  }
+  .bottom-6 {
+    bottom: calc(var(--spacing) * 6);
   }
   .left-3 {
     left: calc(var(--spacing) * 3);
@@ -250,6 +259,24 @@
   }
   .z-50 {
     z-index: 50;
+  }
+  .container {
+    width: 100%;
+    @media (width >= 40rem) {
+      max-width: 40rem;
+    }
+    @media (width >= 48rem) {
+      max-width: 48rem;
+    }
+    @media (width >= 64rem) {
+      max-width: 64rem;
+    }
+    @media (width >= 80rem) {
+      max-width: 80rem;
+    }
+    @media (width >= 96rem) {
+      max-width: 96rem;
+    }
   }
   .mx-auto {
     margin-inline: auto;
@@ -400,6 +427,9 @@
   }
   .w-11 {
     width: calc(var(--spacing) * 11);
+  }
+  .w-14 {
+    width: calc(var(--spacing) * 14);
   }
   .w-20 {
     width: calc(var(--spacing) * 20);
@@ -819,6 +849,10 @@
     transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
     transition-duration: var(--tw-duration, var(--default-transition-duration));
   }
+  .duration-150 {
+    --tw-duration: 150ms;
+    transition-duration: 150ms;
+  }
   .outline-none {
     --tw-outline-style: none;
     outline-style: none;
@@ -894,6 +928,14 @@
     &:focus {
       --tw-outline-style: none;
       outline-style: none;
+    }
+  }
+  .active\:scale-90 {
+    &:active {
+      --tw-scale-x: 90%;
+      --tw-scale-y: 90%;
+      --tw-scale-z: 90%;
+      scale: var(--tw-scale-x) var(--tw-scale-y);
     }
   }
   .md\:flex-row {
@@ -1066,6 +1108,10 @@
   syntax: "*";
   inherits: false;
 }
+@property --tw-duration {
+  syntax: "*";
+  inherits: false;
+}
 @property --tw-scale-x {
   syntax: "*";
   inherits: false;
@@ -1119,6 +1165,7 @@
       --tw-backdrop-opacity: initial;
       --tw-backdrop-saturate: initial;
       --tw-backdrop-sepia: initial;
+      --tw-duration: initial;
       --tw-scale-x: 1;
       --tw-scale-y: 1;
       --tw-scale-z: 1;

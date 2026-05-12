@@ -691,6 +691,31 @@ $posts = $stmt->fetchAll();
 
 </div>
 
+<!-- Floating Add Post button -->
+<a href="/addpost"
+   class="fixed bottom-6 z-50 w-14 h-14 bg-black text-white rounded-full flex items-center justify-content shadow-lg hover:bg-gray-800 active:scale-90 transition-all duration-150"
+   id="fabBtn"
+   style="box-shadow: 0 4px 20px rgba(0,0,0,0.25); display:none;">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+         stroke-width="2.5" stroke="currentColor" class="w-6 h-6 mx-auto">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+    </svg>
+</a>
+
+<script>
+// Position the FAB to align with the right edge of the max-w-xl container
+function positionFab() {
+    const container = document.querySelector('.max-w-xl');
+    const fab       = document.getElementById('fabBtn');
+    if (!container || !fab) return;
+    const rect      = container.getBoundingClientRect();
+    fab.style.right  = (window.innerWidth - rect.right + 16) + 'px';
+    fab.style.display = 'flex';
+}
+positionFab();
+window.addEventListener('resize', positionFab);
+</script>
+
 <script src="/js/profile.js"></script>
 
 </body>
