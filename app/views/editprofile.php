@@ -1,5 +1,5 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 // Default user data (in real app, fetch from DB)
 $user = [

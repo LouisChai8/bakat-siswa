@@ -612,7 +612,6 @@ $posts = $stmt->fetchAll();
                             else                     echo floor($diff/86400) . 'd';
                         ?></span>
                     </div>
-                    <span class="text-gray-400 text-xs select-none">•••</span>
                 </div>
 
                 <p class="mt-1 text-sm post-content-text"><?php echo $post['content']; ?></p>

@@ -1,3 +1,4 @@
+<?php if (session_status() === PHP_SESSION_NONE) session_start(); ?>
 <!DOCTYPE html>
 <html lang="id">
 
@@ -610,10 +611,29 @@
             </div>
 
             <div class="absolute right-4">
+                <?php
+                if (!empty($_SESSION['user_id'])):
+                    // Logged in — show profile photo
+                    require_once __DIR__ . '/../core/Database.php';
+                    $db   = \App\Core\Database::connect();
+                    $stmt = $db->prepare('SELECT profile_pic, name FROM users WHERE id = ?');
+                    $stmt->execute([$_SESSION['user_id']]);
+                    $me   = $stmt->fetch();
+                    $pic  = !empty($me['profile_pic'])
+                            ? '/assets/img/' . htmlspecialchars($me['profile_pic'])
+                            : '/assets/img/Foto Basket Profile.png';
+                ?>
+                <a href="/profile" title="My Post">
+                    <img src="<?php echo $pic; ?>"
+                         alt="<?php echo htmlspecialchars($me['name']); ?>"
+                         class="w-9 h-9 rounded-full object-cover border-2 border-black hover:opacity-80 transition shadow-sm cursor-pointer">
+                </a>
+                <?php else: ?>
                 <a href="/login"
                     class="bg-black text-white text-[10px] font-bold px-4 py-2 rounded-full uppercase tracking-wider hover:bg-gray-800 transition shadow-sm">
                     Login/Register
                 </a>
+                <?php endif; ?>
             </div>
         </nav>
 
@@ -647,7 +667,7 @@
         <!-- Posts -->
         <div class="divide-y divide-gray" id="postFeed">
             <?php
-            require_once __DIR__ . '/../../app/core/Database.php';
+            require_once __DIR__ . '/../core/Database.php';
             $db   = \App\Core\Database::connect();
             $stmt = $db->query('
                 SELECT p.id, p.content, p.image AS img,
@@ -674,8 +694,6 @@
                                     <span class="text-gray-500 text-sm ml-1">@laragooners · 5h</span>
                                     <p class="text-[15px] text-black mt-0.5"><?php echo $post['content']; ?></p>
                                 </div>
-                                <button
-                                    class="text-gray-400 hover:text-black p-1 rounded-full hover:bg-gray-100 transition">•••</button>
                             </div>
 
                             <div class="mt-3 rounded-2xl overflow-hidden border border-gray bg-gray-100">
